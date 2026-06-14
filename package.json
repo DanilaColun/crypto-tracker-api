@@ -4,7 +4,9 @@
   "description": "Backend service for tracking and aggregating cryptocurrency rates via Binance API and other.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "author": "Colun Danila",
   "license": "ISC",
