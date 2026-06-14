@@ -4,7 +4,9 @@
   "description": "Backend service for tracking and aggregating cryptocurrency rates via Binance API and other.",
   "main": "dist/index.js",
   "scripts": {
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
+    "start": "node dist/index.js",
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
