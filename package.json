@@ -2,8 +2,10 @@
   "name": "crypto-tracker-api",
   "version": "1.0.0",
   "description": "Backend service for tracking and aggregating cryptocurrency rates via Binance API and other.",
-  "main": "index.js",
-  "scripts": {},
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
   "author": "Colun Danila",
   "license": "ISC",
   "dependencies": {
