@@ -6,7 +6,7 @@ const logger = new Logger(appConfig.appName, {
   level: appConfig.logLevel,
 });
 
-const app = createApp();
+const app = createApp({ logger });
 
 app.listen(appConfig.port, () => {
   logger.info(`app started on port ${appConfig.port}`);
