@@ -4,12 +4,15 @@ import { SQLiteCurrencyRepository } from '../src/repositories/sqliteCurrencyRepo
 import { CurrencyRepository } from '../src/repositories/currencyRepository';
 import { SQLitePriceRepository } from '../src/repositories/sqlitePriceRepository';
 import { PriceRepository } from '../src/repositories/priceRepository';
+import { SQLitePriceHistoryRepository } from '../src/repositories/sqlitePriceHistoryRepository';
+import { PriceHistoryRepository } from '../src/repositories/priceHistoryRepository';
 import { createTestDatabase } from './createTestDatabase';
 
 interface CreateTestAppOptions {
   apiToken: string;
   currencyRepository?: CurrencyRepository;
   priceRepository?: PriceRepository;
+  priceHistoryRepository?: PriceHistoryRepository;
 }
 
 export async function createTestApp(options: CreateTestAppOptions) {
@@ -21,12 +24,16 @@ export async function createTestApp(options: CreateTestAppOptions) {
   const priceRepository =
     options.priceRepository ?? new SQLitePriceRepository({ db: testDatabase.db });
 
+  const priceHistoryRepository =
+    options.priceHistoryRepository ?? new SQLitePriceHistoryRepository({ db: testDatabase.db });
+
   const logger = new Logger('test', { level: 'error' });
 
   const app = createApp({
     logger,
     currencyRepository,
     priceRepository,
+    priceHistoryRepository,
     apiToken: options.apiToken,
   });
 
@@ -35,5 +42,6 @@ export async function createTestApp(options: CreateTestAppOptions) {
     testDatabase,
     currencyRepository,
     priceRepository,
+    priceHistoryRepository,
   };
 }

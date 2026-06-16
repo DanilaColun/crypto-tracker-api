@@ -46,7 +46,7 @@ async function start(): Promise<void> {
     logger,
   });
 
-  const app = createApp({ logger, currencyRepository, priceRepository });
+  const app = createApp({ logger, currencyRepository, priceRepository, priceHistoryRepository });
 
   const scheduler = startScheduler({ logger, priceUpdateService });
 
