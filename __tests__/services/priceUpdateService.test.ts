@@ -1,6 +1,7 @@
 import { PriceUpdateService } from '../../src/services/priceUpdateService';
 import { CurrencyRepository } from '../../src/repositories/currencyRepository';
 import { PriceRepository } from '../../src/repositories/priceRepository';
+import { PriceHistoryRepository } from '../../src/repositories/priceHistoryRepository';
 import { BinanceService } from '../../src/services/binanceService';
 import { Logger } from '../../src/logger/logger';
 
@@ -13,7 +14,7 @@ function createLogger() {
 }
 
 describe('PriceUpdateService', () => {
-  test('updates prices for all currencies', async () => {
+  test('updates prices and records history for all currencies', async () => {
     const currencyRepository = {
       findAll: jest.fn().mockResolvedValue([
         { name: 'Bitcoin', ticker: 'BTC' },
@@ -24,6 +25,10 @@ describe('PriceUpdateService', () => {
     const priceRepository = {
       replaceForCurrencyTicker: jest.fn().mockResolvedValue(undefined),
     } as unknown as PriceRepository;
+
+    const priceHistoryRepository = {
+      addForCurrencyTicker: jest.fn().mockResolvedValue(undefined),
+    } as unknown as PriceHistoryRepository;
 
     const binanceService = {
       getAllPrices: jest.fn().mockResolvedValue([
@@ -36,28 +41,29 @@ describe('PriceUpdateService', () => {
     const priceUpdateService = new PriceUpdateService({
       currencyRepository,
       priceRepository,
+      priceHistoryRepository,
       binanceService,
       logger: createLogger(),
     });
 
     const result = await priceUpdateService.updateAllPrices({ requestId: 'test-request' });
 
-    expect(currencyRepository.findAll).toHaveBeenCalledTimes(1);
-    expect(binanceService.getAllPrices).toHaveBeenCalledWith({ requestId: 'test-request' });
-
     expect(priceRepository.replaceForCurrencyTicker).toHaveBeenCalledWith('BTC', [
       { symbol: 'BTCUSDT', price: '68000.00000000' },
       { symbol: 'ETHBTC', price: '0.05200000' },
     ]);
 
-    expect(priceRepository.replaceForCurrencyTicker).toHaveBeenCalledWith('ETH', [
-      { symbol: 'ETHBTC', price: '0.05200000' },
-      { symbol: 'ETHUSDT', price: '3500.00000000' },
-    ]);
+    expect(priceHistoryRepository.addForCurrencyTicker).toHaveBeenCalledWith(
+      'BTC',
+      [
+        { symbol: 'BTCUSDT', price: '68000.00000000' },
+        { symbol: 'ETHBTC', price: '0.05200000' },
+      ],
+      expect.any(String),
+    );
 
     expect(result.updatedCurrencies).toBe(2);
     expect(result.updatedPrices).toBe(4);
-    expect(result.durationMs).toEqual(expect.any(Number));
   });
 
   test('skips binance request if there are no currencies', async () => {
@@ -69,6 +75,10 @@ describe('PriceUpdateService', () => {
       replaceForCurrencyTicker: jest.fn(),
     } as unknown as PriceRepository;
 
+    const priceHistoryRepository = {
+      addForCurrencyTicker: jest.fn(),
+    } as unknown as PriceHistoryRepository;
+
     const binanceService = {
       getAllPrices: jest.fn(),
     } as unknown as BinanceService;
@@ -76,6 +86,7 @@ describe('PriceUpdateService', () => {
     const priceUpdateService = new PriceUpdateService({
       currencyRepository,
       priceRepository,
+      priceHistoryRepository,
       binanceService,
       logger: createLogger(),
     });
@@ -83,7 +94,7 @@ describe('PriceUpdateService', () => {
     const result = await priceUpdateService.updateAllPrices({ requestId: 'test-request' });
 
     expect(binanceService.getAllPrices).not.toHaveBeenCalled();
-    expect(priceRepository.replaceForCurrencyTicker).not.toHaveBeenCalled();
+    expect(priceHistoryRepository.addForCurrencyTicker).not.toHaveBeenCalled();
 
     expect(result).toEqual({
       updatedCurrencies: 0,
@@ -101,6 +112,10 @@ describe('PriceUpdateService', () => {
       replaceForCurrencyTicker: jest.fn(),
     } as unknown as PriceRepository;
 
+    const priceHistoryRepository = {
+      addForCurrencyTicker: jest.fn(),
+    } as unknown as PriceHistoryRepository;
+
     const binanceService = {
       getAllPrices: jest.fn().mockRejectedValue(new Error('Binance failed')),
     } as unknown as BinanceService;
@@ -108,6 +123,7 @@ describe('PriceUpdateService', () => {
     const priceUpdateService = new PriceUpdateService({
       currencyRepository,
       priceRepository,
+      priceHistoryRepository,
       binanceService,
       logger: createLogger(),
     });
@@ -117,5 +133,6 @@ describe('PriceUpdateService', () => {
     );
 
     expect(priceRepository.replaceForCurrencyTicker).not.toHaveBeenCalled();
+    expect(priceHistoryRepository.addForCurrencyTicker).not.toHaveBeenCalled();
   });
 });

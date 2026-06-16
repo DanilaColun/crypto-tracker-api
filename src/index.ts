@@ -5,6 +5,7 @@ import { openDatabase } from './database/databaseConnection';
 import { Logger } from './logger/logger';
 import { SQLiteCurrencyRepository } from './repositories/sqliteCurrencyRepository';
 import { SQLitePriceRepository } from './repositories/sqlitePriceRepository';
+import { SQLitePriceHistoryRepository } from './repositories/sqlitePriceHistoryRepository';
 import { BinanceService } from './services/binanceService';
 import { PriceUpdateService } from './services/priceUpdateService';
 import { startScheduler } from './scheduler/startScheduler';
@@ -34,11 +35,13 @@ async function start(): Promise<void> {
 
   const currencyRepository = new SQLiteCurrencyRepository({ db });
   const priceRepository = new SQLitePriceRepository({ db });
+  const priceHistoryRepository = new SQLitePriceHistoryRepository({ db });
 
   const binanceService = new BinanceService({ logger });
   const priceUpdateService = new PriceUpdateService({
     currencyRepository,
     priceRepository,
+    priceHistoryRepository,
     binanceService,
     logger,
   });
