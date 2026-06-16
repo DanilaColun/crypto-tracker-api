@@ -12,4 +12,13 @@ CREATE TABLE IF NOT EXISTS prices (
   PRIMARY KEY (currency_ticker, symbol),
   FOREIGN KEY (currency_ticker) REFERENCES currencies(ticker) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS price_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  currency_ticker TEXT NOT NULL,
+  symbol TEXT NOT NULL,
+  price TEXT NOT NULL,
+  recorded_at TEXT NOT NULL,
+  FOREIGN KEY (currency_ticker) REFERENCES currencies(ticker) ON DELETE CASCADE
+);
 `;

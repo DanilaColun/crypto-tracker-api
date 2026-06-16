@@ -1,11 +1,13 @@
 import { Logger } from '../logger/logger';
 import { CurrencyRepository } from '../repositories/currencyRepository';
 import { Price, PriceRepository } from '../repositories/priceRepository';
+import { PriceHistoryRepository } from '../repositories/priceHistoryRepository';
 import { BinanceService } from './binanceService';
 
 interface PriceUpdateServiceOptions {
   currencyRepository: CurrencyRepository;
   priceRepository: PriceRepository;
+  priceHistoryRepository: PriceHistoryRepository;
   binanceService: BinanceService;
   logger?: Logger;
 }
@@ -19,12 +21,14 @@ interface UpdateResult {
 export class PriceUpdateService {
   private currencyRepository: CurrencyRepository;
   private priceRepository: PriceRepository;
+  private priceHistoryRepository: PriceHistoryRepository;
   private binanceService: BinanceService;
   private logger?: Logger;
 
   constructor(options: PriceUpdateServiceOptions) {
     this.currencyRepository = options.currencyRepository;
     this.priceRepository = options.priceRepository;
+    this.priceHistoryRepository = options.priceHistoryRepository;
     this.binanceService = options.binanceService;
     this.logger = options.logger;
   }
@@ -46,6 +50,7 @@ export class PriceUpdateService {
     }
 
     const allPrices = await this.binanceService.getAllPrices({ requestId });
+    const recordedAt = new Date().toISOString();
 
     let updatedPrices = 0;
 
@@ -53,6 +58,7 @@ export class PriceUpdateService {
       const pricesForCurrency = this.filterPricesByTicker(allPrices, currency.ticker);
 
       await this.priceRepository.replaceForCurrencyTicker(currency.ticker, pricesForCurrency);
+      await this.priceHistoryRepository.addForCurrencyTicker(currency.ticker, pricesForCurrency, recordedAt);
 
       updatedPrices += pricesForCurrency.length;
     }
