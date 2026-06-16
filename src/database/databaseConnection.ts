@@ -7,9 +7,13 @@ interface OpenDatabaseOptions {
   filename: string;
 }
 
-export function openDatabase(options: OpenDatabaseOptions): Promise<AppDatabase> {
-  return open({
+export async function openDatabase(options: OpenDatabaseOptions): Promise<AppDatabase> {
+  const db = await open({
     filename: options.filename,
     driver: sqlite3.Database,
   });
+
+  await db.exec('PRAGMA foreign_keys = ON');
+
+  return db;
 }
