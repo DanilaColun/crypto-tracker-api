@@ -1,0 +1,13 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_FILE: /app/data/app.sqlite
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    
