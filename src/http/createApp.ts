@@ -4,6 +4,7 @@ import { authConfig } from '../config/authConfig';
 import { CurrencyRepository } from '../repositories/currencyRepository';
 import { PriceRepository } from '../repositories/priceRepository';
 import { PriceHistoryRepository } from '../repositories/priceHistoryRepository';
+import { AddressRepository } from '../repositories/addressRepository';
 import { PriceService } from '../services/priceService';
 import { PriceHistoryService } from '../services/priceHistoryService';
 import { createRequestIdMiddleware } from './middlewares/requestIdMiddleware';
@@ -13,12 +14,14 @@ import { createAuthMiddleware } from './middlewares/authMiddleware';
 import { createStatusRoutes } from './routes/statusRoutes';
 import { createCurrencyRoutes } from './routes/currencyRoutes';
 import { createPriceRoutes } from './routes/priceRoutes';
+import { createAddressRoutes } from './routes/addressRoutes';
 
 interface CreateAppOptions {
   logger: Logger;
   currencyRepository: CurrencyRepository;
   priceRepository: PriceRepository;
   priceHistoryRepository: PriceHistoryRepository;
+  addressRepository: AddressRepository;
   apiToken?: string;
 }
 
@@ -46,6 +49,7 @@ export function createApp(options: CreateAppOptions) {
 
   app.use('/api', authMiddleware);
   app.use('/api/currencies', createCurrencyRoutes({ currencyRepository: options.currencyRepository }));
+  app.use('/api/addresses', createAddressRoutes({ addressRepository: options.addressRepository }));
 
   app.use('/price', authMiddleware);
   app.use('/price', createPriceRoutes({ priceService, priceHistoryService }));

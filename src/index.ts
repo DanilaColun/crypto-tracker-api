@@ -6,6 +6,7 @@ import { Logger } from './logger/logger';
 import { SQLiteCurrencyRepository } from './repositories/sqliteCurrencyRepository';
 import { SQLitePriceRepository } from './repositories/sqlitePriceRepository';
 import { SQLitePriceHistoryRepository } from './repositories/sqlitePriceHistoryRepository';
+import { SQLiteAddressRepository } from './repositories/sqliteAddressRepository';
 import { BinanceService } from './services/binanceService';
 import { PriceUpdateService } from './services/priceUpdateService';
 import { startScheduler } from './scheduler/startScheduler';
@@ -36,6 +37,7 @@ async function start(): Promise<void> {
   const currencyRepository = new SQLiteCurrencyRepository({ db });
   const priceRepository = new SQLitePriceRepository({ db });
   const priceHistoryRepository = new SQLitePriceHistoryRepository({ db });
+  const addressRepository = new SQLiteAddressRepository({ db });
 
   const binanceService = new BinanceService({ logger });
   const priceUpdateService = new PriceUpdateService({
@@ -46,7 +48,13 @@ async function start(): Promise<void> {
     logger,
   });
 
-  const app = createApp({ logger, currencyRepository, priceRepository, priceHistoryRepository });
+  const app = createApp({
+    logger,
+    currencyRepository,
+    priceRepository,
+    priceHistoryRepository,
+    addressRepository,
+  });
 
   const scheduler = startScheduler({ logger, priceUpdateService });
 
