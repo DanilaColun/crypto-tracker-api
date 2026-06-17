@@ -9,6 +9,7 @@ import { PriceHistoryRepository } from '../src/repositories/priceHistoryReposito
 import { SQLiteAddressRepository } from '../src/repositories/sqliteAddressRepository';
 import { AddressRepository } from '../src/repositories/addressRepository';
 import { createTestDatabase } from './createTestDatabase';
+import { BlockchainProvider } from '../src/blockchain/blockchainProvider';
 
 interface CreateTestAppOptions {
   apiToken: string;
@@ -16,6 +17,7 @@ interface CreateTestAppOptions {
   priceRepository?: PriceRepository;
   priceHistoryRepository?: PriceHistoryRepository;
   addressRepository?: AddressRepository;
+  blockchainProviders?: BlockchainProvider[];
 }
 
 export async function createTestApp(options: CreateTestAppOptions) {
@@ -41,6 +43,7 @@ export async function createTestApp(options: CreateTestAppOptions) {
     priceRepository,
     priceHistoryRepository,
     addressRepository,
+    blockchainProviders: options.blockchainProviders,
     apiToken: options.apiToken,
   });
 
