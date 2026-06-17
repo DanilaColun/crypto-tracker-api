@@ -4,7 +4,8 @@ import { DatabaseError } from '../errors/DatabaseError';
 
 interface MapErrorContext {
   operation?: string;
-  ticker?: string;
+  conflictMessage?: string;
+  [key: string]: unknown;
 }
 
 function isSqliteConstraintError(error: unknown): boolean {
@@ -22,11 +23,11 @@ export function mapDatabaseError(error: unknown, context: MapErrorContext = {}):
     return error;
   }
 
+  const { conflictMessage, ...rest } = context;
+
   if (isSqliteConstraintError(error) && context.operation === 'create') {
-    return new ConflictError('Currency already exists', {
-      context: {
-        ticker: context.ticker,
-      },
+    return new ConflictError(conflictMessage ?? 'Resource already exists', {
+      context: rest,
     });
   }
 
@@ -34,7 +35,7 @@ export function mapDatabaseError(error: unknown, context: MapErrorContext = {}):
 
   return new DatabaseError('Database operation failed', {
     context: {
-      ...context,
+      ...rest,
       originalMessage,
     },
   });

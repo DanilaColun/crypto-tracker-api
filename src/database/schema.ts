@@ -21,4 +21,11 @@ CREATE TABLE IF NOT EXISTS price_history (
   recorded_at TEXT NOT NULL,
   FOREIGN KEY (currency_ticker) REFERENCES currencies(ticker) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS addresses (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  chain TEXT NOT NULL,
+  address TEXT NOT NULL,
+  UNIQUE (chain, address)
+);
 `;
