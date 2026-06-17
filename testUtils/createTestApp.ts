@@ -6,13 +6,18 @@ import { SQLitePriceRepository } from '../src/repositories/sqlitePriceRepository
 import { PriceRepository } from '../src/repositories/priceRepository';
 import { SQLitePriceHistoryRepository } from '../src/repositories/sqlitePriceHistoryRepository';
 import { PriceHistoryRepository } from '../src/repositories/priceHistoryRepository';
+import { SQLiteAddressRepository } from '../src/repositories/sqliteAddressRepository';
+import { AddressRepository } from '../src/repositories/addressRepository';
 import { createTestDatabase } from './createTestDatabase';
+import { BlockchainProvider } from '../src/blockchain/blockchainProvider';
 
 interface CreateTestAppOptions {
   apiToken: string;
   currencyRepository?: CurrencyRepository;
   priceRepository?: PriceRepository;
   priceHistoryRepository?: PriceHistoryRepository;
+  addressRepository?: AddressRepository;
+  blockchainProviders?: BlockchainProvider[];
 }
 
 export async function createTestApp(options: CreateTestAppOptions) {
@@ -27,6 +32,9 @@ export async function createTestApp(options: CreateTestAppOptions) {
   const priceHistoryRepository =
     options.priceHistoryRepository ?? new SQLitePriceHistoryRepository({ db: testDatabase.db });
 
+  const addressRepository =
+    options.addressRepository ?? new SQLiteAddressRepository({ db: testDatabase.db });
+
   const logger = new Logger('test', { level: 'error' });
 
   const app = createApp({
@@ -34,6 +42,8 @@ export async function createTestApp(options: CreateTestAppOptions) {
     currencyRepository,
     priceRepository,
     priceHistoryRepository,
+    addressRepository,
+    blockchainProviders: options.blockchainProviders,
     apiToken: options.apiToken,
   });
 
@@ -43,5 +53,6 @@ export async function createTestApp(options: CreateTestAppOptions) {
     currencyRepository,
     priceRepository,
     priceHistoryRepository,
+    addressRepository,
   };
 }

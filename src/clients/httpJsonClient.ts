@@ -22,3 +22,21 @@ export async function requestJson(url: string, options: RequestJsonOptions = {})
     body: response.data,
   };
 }
+
+export async function postJson(
+  url: string,
+  body: unknown,
+  options: RequestJsonOptions = {},
+): Promise<HttpResponse> {
+  const timeoutMs = options.timeoutMs ?? 5000;
+
+  const response = await axios.post(url, body, {
+    timeout: timeoutMs,
+    validateStatus: () => true,
+  });
+
+  return {
+    statusCode: response.status,
+    body: response.data,
+  };
+}
