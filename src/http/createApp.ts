@@ -1,4 +1,5 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 import { Logger } from '../logger/logger';
 import { authConfig } from '../config/authConfig';
 import { CurrencyRepository } from '../repositories/currencyRepository';
@@ -12,6 +13,7 @@ import { BlockchainProvider } from '../blockchain/blockchainProvider';
 import { BlockchainProviderRegistry } from '../blockchain/blockchainProviderRegistry';
 import { BitcoinProvider } from '../blockchain/bitcoinProvider';
 import { EthereumProvider } from '../blockchain/ethereumProvider';
+import { openApiDocument } from '../docs/openApiDocument';
 import { createRequestIdMiddleware } from './middlewares/requestIdMiddleware';
 import { createRequestLoggerMiddleware } from './middlewares/requestLoggerMiddleware';
 import { createErrorMiddleware } from './middlewares/errorMiddleware';
@@ -63,6 +65,11 @@ export function createApp(options: CreateAppOptions) {
   app.use(express.json());
 
   app.use(createStatusRoutes());
+
+  app.get('/docs.json', (req, res) => {
+    res.json(openApiDocument);
+  });
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
   app.use('/api', authMiddleware);
   app.use('/api/currencies', createCurrencyRoutes({ currencyRepository: options.currencyRepository }));
